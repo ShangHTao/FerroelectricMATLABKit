@@ -35,8 +35,6 @@ classdef PUND_single_B1500
         PUND_Q; % unit C
         PUND_V; % unit V
         PUND_E; % unit MV/cm
-
-
     end
 
     methods
