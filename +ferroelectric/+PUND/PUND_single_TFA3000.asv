@@ -114,46 +114,37 @@ classdef PUND_single_TFA3000
                 elseif strncmp(line, 'Time [s]', numel('Time [s]'))
                     % 表头检测到，准备读取数据
                     dataCount = 0;
-                    line = fgetl(fileID);
-                    val = str2double(strsplit(strtrim(line)));
-                    [~,datalength] = size(val);
                     while true
-                        if ischar(line) && ~isempty(strtrim(line))
-                            dataCount = dataCount + 1;
-                        else
+                        next_line = fgetl(fileID);
+                        dataCount = dataCount + 1;
+                        if ~ischar(next_line) || isempty(strtrim(next_line))
                             break;
                         end
-                        line = fgetl(fileID);
                     end
-                    break;
                 end
                 % Read the next line
                 line = fgetl(fileID);
             end
             fclose(fileID);
 
-            data_matrix = zeros(dataCount,datalength);
             fileID = fopen(file_path, 'r');
             line = fgetl(fileID);
-            while ischar(line)
-                if strncmp(line, 'Time [s]', numel('Time [s]'))
-                    index = 0;
+            while is
+
+fclose(fileID);
+            data_matrix = [];
+                    % 读取401行数据
                     while true
-                        line = fgetl(fileID);
-                        if ischar(line) && ~isempty(strtrim(line))
-                            val = str2double(strsplit(strtrim(line)));
-                            index = index + 1;
-                            data_matrix(index,:) =  val;
-                        else
+                        next_line = fgetl(fileID);
+                        if ~ischar(next_line) || isempty(strtrim(next_line))
                             break;
                         end
+                        val = str2double(strsplit(strtrim(next_line)));
+                        data_matrix = [data_matrix; val];
                     end
-                    break;
-                end
-                line = fgetl(fileID);% Read the next line
-            end
-            fclose(fileID);
-            
+
+
+
             if obj.Sample_name == "undefined"
                 obj.Sample_name = sample_name;
             end

@@ -54,10 +54,24 @@ classdef PUND_single_B1500
         function obj = extract_raw_data(obj)
             cvs_file_path = obj.CVS_file_path;
             fileID = fopen(cvs_file_path, 'r');
-            V = [];
-            I = [];
-            T = [];
-            line = fgets(fileID);
+            dataCount = 0;
+            line = fgetl(fileID);
+            while ischar(line)
+                if startsWith(line, 'DataValue')
+                    dataCount = dataCount + 1;
+                elseif startsWith(line, 'SetupTitle, WGFMU Pattern Editor Child DataDisplay')
+                    break;
+                end
+                line = fgetl(fileID);
+            end
+            fclose(fileID);
+
+            V = zeros(1, dataCount);
+            I = zeros(1, dataCount);
+            T = zeros(1, dataCount);
+            fileID = fopen(cvs_file_path, 'r');
+            index = 0;
+            line = fgetl(fileID);
             while ischar(line)
                 if startsWith(line, 'SetupTitle, WGFMU Pattern Editor Child DataDisplay')
                     break;
@@ -68,13 +82,15 @@ classdef PUND_single_B1500
                     end
                 elseif startsWith(line, 'DataValue')
                     splitLine = split(line, ',');
-                    V(end + 1) = str2double(splitLine{2});
-                    I(end + 1) = str2double(splitLine{3});
-                    T(end + 1) = str2double(splitLine{4});
+                    index = index + 1;
+                    V(index) = str2double(splitLine{2});
+                    I(index) = str2double(splitLine{3});
+                    T(index) = str2double(splitLine{4});
                 end
                 line = fgetl(fileID);
             end
             fclose(fileID);
+
             obj.Setup_title = setup_title;
             obj.V_raw = V';
             obj.I_raw = -1*I';
